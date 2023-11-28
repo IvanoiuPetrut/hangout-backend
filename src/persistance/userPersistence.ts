@@ -1,6 +1,22 @@
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
 function createUserPersistence({ username, password }) {
-  console.log("Writing user to DB");
-  ///logic
+  return prisma.user.create({
+    data: {
+      username,
+      password,
+    },
+  });
 }
 
-export { createUserPersistence };
+function getUserByIdPersistence({ id }) {
+  return prisma.user.findUnique({
+    where: {
+      id,
+    },
+  });
+}
+
+export { createUserPersistence, getUserByIdPersistence };

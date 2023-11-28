@@ -1,13 +1,19 @@
 import { Request, Response } from "express";
 
-import { createUserInteractor } from "../interactors/userInteractor.js";
-import { createUserPersistence } from "../persistance/userPersistence.js";
+import {
+  createUserInteractor,
+  getUserByIdInteractor,
+} from "../interactors/userInteractor.js";
+import {
+  createUserPersistence,
+  getUserByIdPersistence,
+} from "../persistance/userPersistence.js";
 
 async function createUser(req: Request, res: Response) {
   const { username, password } = req.body;
 
   try {
-    //Validate request body, needs implementation
+    // ! Validate request body, needs implementation
     if (!username || !password) {
       throw new Error("Username and password are required");
     }
@@ -23,4 +29,24 @@ async function createUser(req: Request, res: Response) {
   }
 }
 
-export { createUser };
+async function getUserById(req: Request, res: Response) {
+  const id = Number(req.params.id);
+
+  try {
+    // ! Validate request body, needs implementation
+    if (!id) {
+      throw new Error("ID is required");
+    }
+
+    const user = await getUserByIdInteractor(
+      { getUserByIdPersistence },
+      { id }
+    );
+
+    res.json(user);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+export { createUser, getUserById };

@@ -1,6 +1,7 @@
 class UserEntity {
   name: string;
   password: string;
+  id: number;
 
   constructor(name: string, password: string) {
     this.name = name;
