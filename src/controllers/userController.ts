@@ -5,11 +5,12 @@ import {
   getUserByIdInteractor,
 } from "../interactors/userInteractor.js";
 import {
+  UserDto,
   createUserPersistence,
   getUserByIdPersistence,
 } from "../persistance/userPersistence.js";
 
-async function createUser(req: Request, res: Response) {
+async function createUser(req: Request, res: Response): Promise<void> {
   const { username, password } = req.body;
 
   try {
@@ -18,7 +19,7 @@ async function createUser(req: Request, res: Response) {
       throw new Error("Username and password are required");
     }
 
-    const user = await createUserInteractor(
+    const user: UserDto = await createUserInteractor(
       { createUserPersistence },
       { username, password }
     );
@@ -29,7 +30,7 @@ async function createUser(req: Request, res: Response) {
   }
 }
 
-async function getUserById(req: Request, res: Response) {
+async function getUserById(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id);
 
   try {
@@ -38,7 +39,7 @@ async function getUserById(req: Request, res: Response) {
       throw new Error("ID is required");
     }
 
-    const user = await getUserByIdInteractor(
+    const user: UserDto = await getUserByIdInteractor(
       { getUserByIdPersistence },
       { id }
     );

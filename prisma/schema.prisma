@@ -4,6 +4,7 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 model User {
 
   id    Int     @id @default(autoincrement())
@@ -15,9 +16,7 @@ model User {
 }
 
 
-
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
-
