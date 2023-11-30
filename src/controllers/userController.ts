@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { validateUser, validateUserId } from "../validation/user.js";
 
 import {
   createUserInteractor,
@@ -14,10 +15,7 @@ async function createUser(req: Request, res: Response): Promise<void> {
   const { username, password } = req.body;
 
   try {
-    // ! Validate request body, needs implementation
-    if (!username || !password) {
-      throw new Error("Username and password are required");
-    }
+    validateUser(username, password);
 
     const user: UserDto = await createUserInteractor(
       { createUserPersistence },
@@ -34,10 +32,7 @@ async function getUserById(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id);
 
   try {
-    // ! Validate request body, needs implementation
-    if (!id) {
-      throw new Error("ID is required");
-    }
+    validateUserId(id);
 
     const user: UserDto = await getUserByIdInteractor(
       { getUserByIdPersistence },
