@@ -1,10 +1,15 @@
 import { Request, Response } from "express";
-import { validateUser, validateUserId } from "../validation/user.js";
+import {
+  validateUser,
+  validateUserId,
+  validateUserCode,
+} from "../validation/user.js";
 
 import {
   createUserInteractor,
   getUserByIdInteractor,
 } from "../interactors/userInteractor.js";
+
 import {
   UserDto,
   createUserPersistence,
@@ -12,6 +17,7 @@ import {
 } from "../persistance/userPersistence.js";
 
 async function createUser(req: Request, res: Response): Promise<void> {
+  console.log("createUser");
   const { username, password } = req.body;
 
   try {
@@ -29,6 +35,7 @@ async function createUser(req: Request, res: Response): Promise<void> {
 }
 
 async function getUserById(req: Request, res: Response): Promise<void> {
+  console.log("getUserById");
   const id = Number(req.params.id);
 
   try {
