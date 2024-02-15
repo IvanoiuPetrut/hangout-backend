@@ -15,11 +15,15 @@ async function verifyTokens(req, res, next) {
 
   try {
     const payload = await verifier.verify(accessToken);
-    console.log(payload);
     next();
   } catch (err) {
     return res.status(401).json({ message: "Invalid tokens" });
   }
 }
 
-export { verifyTokens };
+async function getUserId(accessToken) {
+  const payload = await verifier.verify(accessToken);
+  return payload.sub;
+}
+
+export { verifyTokens, getUserId };

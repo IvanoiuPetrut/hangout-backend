@@ -7,12 +7,11 @@ generator client {
 
 model User {
 
-  id    Int     @id @default(autoincrement())
+  id       String  @id
 
   username String  @unique
 
-  password  String
-
+  photo    String? @default("https://www.gravatar.com/avatar/3b3be63a4c2asdas01asdasda02?d=identicon")
 }
 
 

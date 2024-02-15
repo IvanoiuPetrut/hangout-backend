@@ -3,8 +3,9 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export type UserDto = {
-  id: number;
+  id: string;
   username: string;
+  photo: string;
 };
 
 type UserPersistence = {
@@ -22,37 +23,43 @@ type GetUserByIdPersistenceArgs = {
   id: number;
 };
 
-function mapUserPersistenceToUserDto(user: UserPersistence): UserDto {
-  return {
-    id: user.id,
-    username: user.username,
-  };
-}
-
-async function createUserPersistence({
-  username,
-  password,
-}: CreateUserPersistenceArgs): Promise<UserDto> {
+async function createUserPersistence({ id, username }) {
+  console.log(id);
+  console.log(username);
   const user = await prisma.user.create({
     data: {
+      id,
       username,
-      password,
     },
   });
-  const userDto = mapUserPersistenceToUserDto(user);
-  return userDto;
+  return user;
 }
 
-async function getUserByIdPersistence({
-  id,
-}: GetUserByIdPersistenceArgs): Promise<UserDto> {
-  const user = await prisma.user.findUnique({
+async function getUserByIdPersistence({ id }: GetUserByIdPersistenceArgs) {
+  // const user = await prisma.user.findUnique({
+  //   where: {
+  //     id,
+  //   },
+  // });
+  // const userDto = mapUserPersistenceToUserDto(user);
+  // return userDto;
+}
+
+async function getUserDetailsPersistence({ id }) {
+  let user;
+  user = await prisma.user.findUnique({
     where: {
       id,
     },
   });
-  const userDto = mapUserPersistenceToUserDto(user);
-  return userDto;
+  if (!user) {
+    user = createUserPersistence({ id, username: id });
+  }
+  return user;
 }
 
-export { createUserPersistence, getUserByIdPersistence };
+export {
+  createUserPersistence,
+  getUserByIdPersistence,
+  getUserDetailsPersistence,
+};

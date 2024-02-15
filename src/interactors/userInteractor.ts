@@ -4,13 +4,11 @@ import { UserDto } from "../persistance/userPersistence.js";
 
 async function createUserInteractor(
   { createUserPersistence },
-  { username, password }
+  { id, username }
 ): Promise<UserDto> {
-  const user = new UserEntity(username, password);
-  user.validate();
   const userDto: UserDto = await createUserPersistence({
-    username: user.name,
-    password: user.password,
+    id,
+    username,
   });
   return userDto;
 }
@@ -23,4 +21,16 @@ async function getUserByIdInteractor(
   return userDto;
 }
 
-export { createUserInteractor, getUserByIdInteractor };
+async function getUserDetailsInteractor(
+  { getUserDetailsPersistence },
+  { id }
+): Promise<UserDto> {
+  const userDto: UserDto = await getUserDetailsPersistence({ id });
+  return userDto;
+}
+
+export {
+  createUserInteractor,
+  getUserByIdInteractor,
+  getUserDetailsInteractor,
+};

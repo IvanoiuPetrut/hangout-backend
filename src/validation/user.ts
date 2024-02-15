@@ -6,21 +6,15 @@ function validateUsername(username: string): void {
   }
 }
 
-function validatePassword(password: string): void {
-  if (validator.isStrongPassword(password) === false) {
-    throw new Error("Password must be strong");
+function validateUserId(id: string): void {
+  if (validator.isUUID(id) === false) {
+    throw new Error("User id must be an UUID");
   }
 }
 
-function validateUserId(id: number): void {
-  if (validator.isInt(String(id)) === false) {
-    throw new Error("User id must be an integer");
-  }
-}
-
-function validateUser(username: string, password: string): void {
+function validateUser(id: string, username: string): void {
+  validateUserId(id);
   validateUsername(username);
-  validatePassword(password);
 }
 
 function validateUserCode(code: string): void {

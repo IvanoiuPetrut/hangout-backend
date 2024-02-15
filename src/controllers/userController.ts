@@ -8,24 +8,27 @@ import {
 import {
   createUserInteractor,
   getUserByIdInteractor,
+  getUserDetailsInteractor,
 } from "../interactors/userInteractor.js";
 
 import {
   UserDto,
   createUserPersistence,
   getUserByIdPersistence,
+  getUserDetailsPersistence,
 } from "../persistance/userPersistence.js";
 
+import { getUserId } from "../middleware/verifyUser.js";
+
 async function createUser(req: Request, res: Response): Promise<void> {
-  console.log("createUser");
-  const { username, password } = req.body;
+  const { id, username } = req.body;
 
   try {
-    validateUser(username, password);
+    validateUser(id, username);
 
-    const user: UserDto = await createUserInteractor(
+    const user = await createUserInteractor(
       { createUserPersistence },
-      { username, password }
+      { id, username }
     );
 
     res.json(user);
@@ -39,7 +42,7 @@ async function getUserById(req: Request, res: Response): Promise<void> {
   const id = Number(req.params.id);
 
   try {
-    validateUserId(id);
+    // validateUserId(id);
 
     const user: UserDto = await getUserByIdInteractor(
       { getUserByIdPersistence },
@@ -52,4 +55,20 @@ async function getUserById(req: Request, res: Response): Promise<void> {
   }
 }
 
-export { createUser, getUserById };
+async function getUserDetails(req: Request, res: Response): Promise<void> {
+  const accessToken = req.headers["access-token"];
+
+  try {
+    const id = await getUserId(accessToken);
+
+    const user = await getUserDetailsInteractor(
+      { getUserDetailsPersistence },
+      { id }
+    );
+    res.json(user);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+export { createUser, getUserById, getUserDetails };
