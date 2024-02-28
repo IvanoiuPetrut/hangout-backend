@@ -58,8 +58,21 @@ async function getUserDetailsPersistence({ id }) {
   return user;
 }
 
+async function updateUserDetailsPersistence({ id, username }) {
+  const user = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      username,
+    },
+  });
+  return user;
+}
+
 export {
   createUserPersistence,
   getUserByIdPersistence,
   getUserDetailsPersistence,
+  updateUserDetailsPersistence,
 };

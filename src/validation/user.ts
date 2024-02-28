@@ -23,4 +23,4 @@ function validateUserCode(code: string): void {
   }
 }
 
-export { validateUser, validateUserId, validateUserCode };
+export { validateUser, validateUserId, validateUserCode, validateUsername };
