@@ -70,9 +70,21 @@ async function updateUserDetailsPersistence({ id, username }) {
   return user;
 }
 
+async function getUsersPersistence({ name }) {
+  const users = await prisma.user.findMany({
+    where: {
+      username: {
+        contains: name,
+      },
+    },
+  });
+  return users;
+}
+
 export {
   createUserPersistence,
   getUserByIdPersistence,
   getUserDetailsPersistence,
   updateUserDetailsPersistence,
+  getUsersPersistence,
 };

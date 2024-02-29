@@ -37,9 +37,18 @@ async function updateUserDetailsInteractor(
   return userDto;
 }
 
+async function getUsersInteractor(
+  { getUsersPersistence },
+  { name }
+): Promise<User[]> {
+  const users: User[] = await getUsersPersistence({ name });
+  return users;
+}
+
 export {
   createUserInteractor,
   getUserByIdInteractor,
   getUserDetailsInteractor,
   updateUserDetailsInteractor,
+  getUsersInteractor,
 };
