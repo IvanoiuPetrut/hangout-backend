@@ -39,9 +39,9 @@ async function updateUserDetailsInteractor(
 
 async function getUsersInteractor(
   { getUsersPersistence },
-  { name }
+  { name, id }
 ): Promise<User[]> {
-  const users: User[] = await getUsersPersistence({ name });
+  const users: User[] = await getUsersPersistence({ name, id });
   return users;
 }
 

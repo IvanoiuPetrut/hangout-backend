@@ -6,14 +6,40 @@ generator client {
 }
 
 model User {
+  id String @id
 
-  id       String  @id
+  username String @unique
 
-  username String  @unique
+  photo String? @default("https://www.gravatar.com/avatar/3b3be63a4c2asdas01asdasda02?d=identicon")
 
-  photo    String? @default("https://www.gravatar.com/avatar/3b3be63a4c2asdas01asdasda02?d=identicon")
+  friends Friends[]
 }
 
+model FriendRequests {
+  from String
+
+  to String
+
+  status String @default("pending")
+
+  createdAt DateTime @default(now())
+
+  @@id([from, to])
+}
+
+model Friends {
+  id String @id @default(uuid())
+
+  friendId String
+
+  createdAt DateTime @default(now())
+
+  User      User?    @relation(fields: [userId], references: [id])
+
+  userId    String?
+
+  @@unique([userId, friendId])
+}
 
 datasource db {
   provider = "sqlite"

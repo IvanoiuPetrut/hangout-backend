@@ -62,9 +62,10 @@ async function getUserById(req: Request, res: Response): Promise<void> {
 
 async function getUserDetails(req: Request, res: Response): Promise<void> {
   const accessToken = req.headers["access-token"];
+  const id = req.params.id || (await getUserId(accessToken));
 
   try {
-    const id = await getUserId(accessToken);
+    validateUserId(id);
 
     const user = await getUserDetailsInteractor(
       { getUserDetailsPersistence },
@@ -97,11 +98,16 @@ async function updateUserDetails(req: Request, res: Response): Promise<void> {
 
 async function getUsers(req: Request, res: Response): Promise<void> {
   const { name } = req.query;
+  const accessToken = req.headers["access-token"];
+  const id = await getUserId(accessToken);
 
   try {
     validateUsername(name as string);
 
-    const users = await getUsersInteractor({ getUsersPersistence }, { name });
+    const users = await getUsersInteractor(
+      { getUsersPersistence },
+      { name, id }
+    );
     res.status(200).json(users);
   } catch (error) {
     res.status(400).json({ error: error.message });

@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import { userRouter } from "./routes/userRoute.js";
+import { friendRouter } from "./routes/friendRoute.js";
 import { verifyTokens } from "./middleware/verifyUser.js";
 
 const app = express();
@@ -26,6 +27,7 @@ app.use(cors());
 app.use(express.json());
 app.use(verifyTokens);
 app.use("/user", userRouter);
+app.use("/friend", friendRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello from TypeScript + Express!");

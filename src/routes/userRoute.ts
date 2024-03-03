@@ -13,6 +13,6 @@ router.post("/create", createUser);
 router.get("/id/:id", getUserById);
 router.get("/details", getUserDetails);
 router.get("/users", getUsers);
+router.get("/details/:id", getUserDetails);
 router.patch("/details", updateUserDetails);
-
 export { router as userRouter };
