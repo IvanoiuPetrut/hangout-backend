@@ -47,10 +47,16 @@ async function declineFriendRequestInteractor(
   return friendRequest;
 }
 
+async function getFriendsInteractor({ getFriendsPersistence }, { userId }) {
+  const friends = await getFriendsPersistence({ userId });
+  return friends;
+}
+
 export {
   createFriendRequestInteractor,
   getFriendRequestInteractor,
   getPendingFriendRequestInteractor,
   acceptFriendRequestInteractor,
   declineFriendRequestInteractor,
+  getFriendsInteractor,
 };

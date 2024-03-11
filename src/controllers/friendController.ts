@@ -9,6 +9,7 @@ import {
   getPendingFriendRequestInteractor,
   acceptFriendRequestInteractor,
   declineFriendRequestInteractor,
+  getFriendsInteractor,
 } from "../interactors/friendInteractor.js";
 
 import {
@@ -17,6 +18,7 @@ import {
   getPendingFriendRequestPersistence,
   acceptFriendRequestPersistence,
   declineFriendRequestPersistence,
+  getFriendsPersistence,
 } from "../persistance/friendPersistence.js";
 
 async function createFriendRequest(req: Request, res: Response): Promise<void> {
@@ -121,10 +123,29 @@ async function declineFriendRequest(
   }
 }
 
+async function getFriends(req: Request, res: Response): Promise<void> {
+  const accessToken = req.headers["access-token"];
+  const userId = await getUserId(accessToken);
+
+  try {
+    validateUserId(userId);
+
+    const friends = await getFriendsInteractor(
+      { getFriendsPersistence },
+      { userId }
+    );
+
+    res.json(friends);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
 export {
   createFriendRequest,
   getFriendRequest,
   getPendingFriendRequest,
   acceptFriendRequest,
   declineFriendRequest,
+  getFriends,
 };

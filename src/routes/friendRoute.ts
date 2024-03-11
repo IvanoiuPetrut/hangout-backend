@@ -7,8 +7,10 @@ import {
   getPendingFriendRequest,
   acceptFriendRequest,
   declineFriendRequest,
+  getFriends,
 } from "../controllers/friendController.js";
 
+router.get("/", getFriends);
 router.post("/send-request", createFriendRequest);
 router.get("/requests", getFriendRequest);
 router.get("/requests/pending", getPendingFriendRequest);

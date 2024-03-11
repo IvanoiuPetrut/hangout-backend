@@ -41,7 +41,7 @@ async function acceptFriendRequestPersistence({ senderId, receiverId }) {
       status: "accepted",
     },
   });
-  const friendRelation = await prisma.friends.create({
+  const receiverFriendRelation = await prisma.friends.create({
     data: {
       User: {
         connect: {
@@ -51,7 +51,18 @@ async function acceptFriendRequestPersistence({ senderId, receiverId }) {
       friendId: senderId,
     },
   });
-  return friendRelation;
+
+  await prisma.friends.create({
+    data: {
+      User: {
+        connect: {
+          id: senderId,
+        },
+      },
+      friendId: receiverId,
+    },
+  });
+  return receiverFriendRelation;
 }
 
 async function declineFriendRequestPersistence({ senderId, receiverId }) {
@@ -66,10 +77,32 @@ async function declineFriendRequestPersistence({ senderId, receiverId }) {
   });
 }
 
+async function getFriendsPersistence({ userId }) {
+  const friendsIds = await prisma.friends.findMany({
+    where: {
+      userId,
+    },
+    include: {
+      User: false,
+    },
+  });
+  const friends = [];
+  for (const friendId of friendsIds) {
+    const friend = await prisma.user.findUnique({
+      where: {
+        id: friendId.friendId,
+      },
+    });
+    friends.push(friend);
+  }
+  return friends;
+}
+
 export {
   createFriendRequestPersistence,
   getFriendRequestPersistence,
   getPendingFriendRequestPersistence,
   acceptFriendRequestPersistence,
   declineFriendRequestPersistence,
+  getFriendsPersistence,
 };
