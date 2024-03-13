@@ -31,14 +31,33 @@ async function createMessagePersistence({
   return message;
 }
 
-async function createChatRoomPersistence({ id }) {
+async function createChatRoomPersistence({ id, firstUserId, secondUserId }) {
   const chatRoom = await prisma.chatRoom.create({
     data: {
       id,
       name: id,
+      members: {
+        connect: [{ id: firstUserId }, { id: secondUserId }],
+      },
     },
   });
   return chatRoom;
 }
 
-export { createMessagePersistence, createChatRoomPersistence };
+async function getMessagesFromChatRoomPersistence({ chatRoomId, userId }) {
+  const messages = await prisma.message.findMany({
+    where: {
+      chatRoomId,
+      AND: {
+        OR: [{ senderId: userId }, { receiverId: userId }],
+      },
+    },
+  });
+  return messages;
+}
+
+export {
+  createMessagePersistence,
+  createChatRoomPersistence,
+  getMessagesFromChatRoomPersistence,
+};

@@ -11,9 +11,31 @@ async function createMessageInteractor(
   return message;
 }
 
-async function createChatRoomInteractor({ createChatRoomPersistence }, { id }) {
-  const chatRoom = await createChatRoomPersistence({ id });
+async function createChatRoomInteractor(
+  { createChatRoomPersistence },
+  { id, firstUserId, secondUserId }
+) {
+  const chatRoom = await createChatRoomPersistence({
+    id,
+    firstUserId,
+    secondUserId,
+  });
   return chatRoom;
 }
 
-export { createMessageInteractor, createChatRoomInteractor };
+async function getMessagesFromChatRoomInteractor(
+  { getMessagesFromChatRoomPersistence },
+  { chatRoomId, userId }
+) {
+  const messages = await getMessagesFromChatRoomPersistence({
+    chatRoomId,
+    userId,
+  });
+  return messages;
+}
+
+export {
+  createMessageInteractor,
+  createChatRoomInteractor,
+  getMessagesFromChatRoomInteractor,
+};

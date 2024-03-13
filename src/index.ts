@@ -3,6 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 import { userRouter } from "./routes/userRoute.js";
 import { friendRouter } from "./routes/friendRoute.js";
+import { messagesRouter } from "./routes/messagesRoute.js";
 import {
   verifyTokens,
   verifyTokenSocket,
@@ -43,9 +44,10 @@ app.use(cors());
 app.use(express.json());
 app.use(verifyTokens);
 app.use("/user", userRouter);
-const server = http.createServer(app);
-
 app.use("/friend", friendRouter);
+app.use("/messages", messagesRouter);
+
+const server = http.createServer(app);
 
 app.get("/", (req, res) => {
   res.send("Hello from TypeScript + Express!");
@@ -109,14 +111,19 @@ io.on("connection", (socket) => {
   });
 
   socket.on("createFriendChat", async (payload: createFriendChatPayload) => {
-    const userIds = [await getUserId(payload.userToken), payload.friendId];
+    const senderId = await getUserId(payload.userToken);
+    const userIds = [senderId, payload.friendId];
     userIds.sort();
     const chatRoomId = userIds.join("_");
     socket.join(chatRoomId);
     try {
       await createChatRoomInteractor(
         { createChatRoomPersistence },
-        { id: chatRoomId }
+        {
+          id: chatRoomId,
+          firstUserId: senderId,
+          secondUserId: payload.friendId,
+        }
       );
     } catch (error) {
       console.log("error:", error);
