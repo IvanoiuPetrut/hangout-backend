@@ -13,6 +13,8 @@ model User {
   photo String? @default("https://www.gravatar.com/avatar/3b3be63a4c2asdas01asdasda02?d=identicon")
 
   friends Friends[]
+
+  chatRooms ChatRoom[]
 }
 
 model FriendRequests {
@@ -34,11 +36,30 @@ model Friends {
 
   createdAt DateTime @default(now())
 
-  User      User?    @relation(fields: [userId], references: [id])
+  User User? @relation(fields: [userId], references: [id])
 
-  userId    String?
+  userId String?
 
   @@unique([userId, friendId])
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String?
+  chatRoomId String?
+  content    String
+  createdAt  DateTime @default(now())
+
+  ChatRoom   ChatRoom? @relation(fields: [chatRoomId], references: [id])
+}
+
+model ChatRoom {
+  id       String   @id
+  name     String
+  members  User[]
+
+  Messages Message[]
 }
 
 datasource db {

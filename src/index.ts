@@ -3,7 +3,23 @@ import cors from "cors";
 import "dotenv/config";
 import { userRouter } from "./routes/userRoute.js";
 import { friendRouter } from "./routes/friendRoute.js";
-import { verifyTokens } from "./middleware/verifyUser.js";
+import {
+  verifyTokens,
+  verifyTokenSocket,
+  getUserId,
+} from "./middleware/verifyUser.js";
+
+import {
+  createMessagePersistence,
+  createChatRoomPersistence,
+} from "./persistance/messagePersistence.js";
+import {
+  createMessageInteractor,
+  createChatRoomInteractor,
+} from "./interactors/messageInteractor.js";
+
+import { Server } from "socket.io";
+import http from "http";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -27,12 +43,89 @@ app.use(cors());
 app.use(express.json());
 app.use(verifyTokens);
 app.use("/user", userRouter);
+const server = http.createServer(app);
+
 app.use("/friend", friendRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello from TypeScript + Express!");
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
+});
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
+
+io.use(async (socket, next) => {
+  const token = socket.handshake.auth.token;
+  const isAuthenticated = await verifyTokenSocket(token);
+  if (isAuthenticated) {
+    return next();
+  }
+  return next(new Error("Authentication error"));
+});
+
+type createFriendChatPayload = {
+  userToken: string;
+  friendId: string;
+};
+
+type friendChatMessagePayload = {
+  userToken: string;
+  friendId: string;
+  message: string;
+};
+
+io.on("connection", (socket) => {
+  console.log("a user connected", socket.id);
+
+  socket.emit("message", "Hello from server!");
+
+  socket.on("message", (message) => {
+    console.log("message from client:", message);
+    socket.emit("message", message);
+  });
+
+  socket.on("friendChatMessage", async (payload: friendChatMessagePayload) => {
+    const senderId = await getUserId(payload.userToken);
+    const userIds = [senderId, payload.friendId];
+    userIds.sort();
+    const chatRoomId = userIds.join("_");
+    socket.to(chatRoomId).emit("friendChatMessage", payload.message);
+    await createMessageInteractor(
+      { createMessagePersistence },
+      {
+        senderId,
+        receiverId: payload.friendId,
+        chatRoomId,
+        content: payload.message,
+      }
+    );
+  });
+
+  socket.on("createFriendChat", async (payload: createFriendChatPayload) => {
+    const userIds = [await getUserId(payload.userToken), payload.friendId];
+    userIds.sort();
+    const chatRoomId = userIds.join("_");
+    socket.join(chatRoomId);
+    try {
+      await createChatRoomInteractor(
+        { createChatRoomPersistence },
+        { id: chatRoomId }
+      );
+    } catch (error) {
+      console.log("error:", error);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("user disconnected", socket.id);
+  });
+
+  // Add more event handlers as needed
 });

@@ -14,16 +14,29 @@ async function verifyTokens(req, res, next) {
   }
 
   try {
-    const payload = await verifier.verify(accessToken);
+    await verifier.verify(accessToken);
     next();
   } catch (err) {
     return res.status(401).json({ message: "Invalid tokens" });
   }
 }
 
-async function getUserId(accessToken) {
-  const payload = await verifier.verify(accessToken);
-  return payload.sub;
+async function verifyTokenSocket(token) {
+  try {
+    await verifier.verify(token);
+    return true;
+  } catch (err) {
+    return false;
+  }
 }
 
-export { verifyTokens, getUserId };
+async function getUserId(accessToken) {
+  try {
+    const payload = await verifier.verify(accessToken);
+    return payload.sub;
+  } catch (err) {
+    return null;
+  }
+}
+
+export { verifyTokens, getUserId, verifyTokenSocket };
