@@ -13,12 +13,11 @@ async function createMessageInteractor(
 
 async function createChatRoomInteractor(
   { createChatRoomPersistence },
-  { id, firstUserId, secondUserId }
+  { id, userIds }
 ) {
   const chatRoom = await createChatRoomPersistence({
     id,
-    firstUserId,
-    secondUserId,
+    userIds,
   });
   return chatRoom;
 }

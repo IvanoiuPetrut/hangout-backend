@@ -31,13 +31,13 @@ async function createMessagePersistence({
   return message;
 }
 
-async function createChatRoomPersistence({ id, firstUserId, secondUserId }) {
+async function createChatRoomPersistence({ id, userIds }) {
   const chatRoom = await prisma.chatRoom.create({
     data: {
       id,
       name: id,
       members: {
-        connect: [{ id: firstUserId }, { id: secondUserId }],
+        connect: userIds.map((id) => ({ id })),
       },
     },
   });

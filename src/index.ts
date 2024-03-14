@@ -4,20 +4,14 @@ import "dotenv/config";
 import { userRouter } from "./routes/userRoute.js";
 import { friendRouter } from "./routes/friendRoute.js";
 import { messagesRouter } from "./routes/messagesRoute.js";
-import {
-  verifyTokens,
-  verifyTokenSocket,
-  getUserId,
-} from "./middleware/verifyUser.js";
+import { verifyTokens, verifyTokenSocket } from "./middleware/verifyUser.js";
 
 import {
-  createMessagePersistence,
-  createChatRoomPersistence,
-} from "./persistance/messagePersistence.js";
-import {
-  createMessageInteractor,
-  createChatRoomInteractor,
-} from "./interactors/messageInteractor.js";
+  handleCreateFriendChat,
+  handleFriendChatMessage,
+  createFriendChatPayload,
+  friendChatMessagePayload,
+} from "./sockets/messages.js";
 
 import { Server } from "socket.io";
 import http from "http";
@@ -72,67 +66,20 @@ io.use(async (socket, next) => {
   return next(new Error("Authentication error"));
 });
 
-type createFriendChatPayload = {
-  userToken: string;
-  friendId: string;
-};
-
-type friendChatMessagePayload = {
-  userToken: string;
-  friendId: string;
-  message: string;
-};
-
 io.on("connection", (socket) => {
-  console.log("a user connected", socket.id);
-
-  socket.emit("message", "Hello from server!");
-
-  socket.on("message", (message) => {
-    console.log("message from client:", message);
-    socket.emit("message", message);
+  socket.on("connect", () => {
+    console.log("user connected", socket.id);
   });
 
   socket.on("friendChatMessage", async (payload: friendChatMessagePayload) => {
-    const senderId = await getUserId(payload.userToken);
-    const userIds = [senderId, payload.friendId];
-    userIds.sort();
-    const chatRoomId = userIds.join("_");
-    socket.to(chatRoomId).emit("friendChatMessage", payload.message);
-    await createMessageInteractor(
-      { createMessagePersistence },
-      {
-        senderId,
-        receiverId: payload.friendId,
-        chatRoomId,
-        content: payload.message,
-      }
-    );
+    handleFriendChatMessage(socket, payload);
   });
 
   socket.on("createFriendChat", async (payload: createFriendChatPayload) => {
-    const senderId = await getUserId(payload.userToken);
-    const userIds = [senderId, payload.friendId];
-    userIds.sort();
-    const chatRoomId = userIds.join("_");
-    socket.join(chatRoomId);
-    try {
-      await createChatRoomInteractor(
-        { createChatRoomPersistence },
-        {
-          id: chatRoomId,
-          firstUserId: senderId,
-          secondUserId: payload.friendId,
-        }
-      );
-    } catch (error) {
-      console.log("error:", error);
-    }
+    handleCreateFriendChat(socket, payload);
   });
 
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id);
   });
-
-  // Add more event handlers as needed
 });

@@ -1,10 +1,19 @@
 import { Request, Response } from "express";
 import { getUserId } from "../middleware/verifyUser.js";
 import { validateUserId } from "../validation/user.js";
+import { validateMessageContent } from "../validation/messages.js";
 
-import { getMessagesFromChatRoomInteractor } from "../interactors/messageInteractor.js";
+import {
+  getMessagesFromChatRoomInteractor,
+  createMessageInteractor,
+  createChatRoomInteractor,
+} from "../interactors/messageInteractor.js";
 
-import { getMessagesFromChatRoomPersistence } from "../persistance/messagePersistence.js";
+import {
+  getMessagesFromChatRoomPersistence,
+  createMessagePersistence,
+  createChatRoomPersistence,
+} from "../persistance/messagePersistence.js";
 
 async function getMessagesFromChatRoom(
   req: Request,
@@ -53,4 +62,40 @@ async function getMessagesFromFriendChatRoom(
   }
 }
 
-export { getMessagesFromChatRoom, getMessagesFromFriendChatRoom };
+async function createMessage(
+  senderId: string,
+  receiverId: string,
+  chatRoomId: string,
+  content: string
+) {
+  try {
+    validateUserId(senderId);
+    validateUserId(receiverId);
+    validateMessageContent(content);
+
+    await createMessageInteractor(
+      { createMessagePersistence },
+      { senderId, receiverId, chatRoomId, content }
+    );
+  } catch (error) {
+    console.log("error:", error);
+  }
+}
+
+async function createChatRoom(chatRoomId: string, userIds: Array<string>) {
+  try {
+    await createChatRoomInteractor(
+      { createChatRoomPersistence },
+      { id: chatRoomId, userIds }
+    );
+  } catch (error) {
+    console.log("error:", error);
+  }
+}
+
+export {
+  getMessagesFromChatRoom,
+  getMessagesFromFriendChatRoom,
+  createMessage,
+  createChatRoom,
+};
