@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { getUserId } from "../middleware/verifyUser.js";
 import { validateUserId } from "../validation/user.js";
 import { validateMessageContent } from "../validation/messages.js";
+import { generateFriendsChatRoomId } from "../helpers/helpers.js";
 
 import {
   getMessagesFromChatRoomInteractor,
@@ -48,8 +49,7 @@ async function getMessagesFromFriendChatRoom(
   try {
     validateUserId(userId);
     validateUserId(friendId);
-    const userIds = [userId, friendId].sort();
-    const chatRoomId = userIds.join("_");
+    const chatRoomId = generateFriendsChatRoomId(userId, friendId);
 
     const messages = await getMessagesFromChatRoomInteractor(
       { getMessagesFromChatRoomPersistence },
@@ -71,7 +71,6 @@ async function createMessage(
   try {
     validateUserId(senderId);
     validateUserId(receiverId);
-    validateMessageContent(content);
 
     await createMessageInteractor(
       { createMessagePersistence },
