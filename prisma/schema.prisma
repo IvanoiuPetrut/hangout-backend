@@ -55,8 +55,8 @@ model Message {
 }
 
 model ChatRoom {
-  id       String   @id
-  name     String
+  id       String   @id @default(uuid())
+  name     String   @unique
   members  User[]
 
   Messages Message[]

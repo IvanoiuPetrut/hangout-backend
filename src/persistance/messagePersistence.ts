@@ -31,7 +31,7 @@ async function createMessagePersistence({
   return message;
 }
 
-async function createChatRoomPersistence({ id, userIds }) {
+async function createChatRoomFriendsPersistence({ id, userIds }) {
   const chatRoom = await prisma.chatRoom.create({
     data: {
       id,
@@ -58,6 +58,6 @@ async function getMessagesFromChatRoomPersistence({ chatRoomId, userId }) {
 
 export {
   createMessagePersistence,
-  createChatRoomPersistence,
+  createChatRoomFriendsPersistence,
   getMessagesFromChatRoomPersistence,
 };

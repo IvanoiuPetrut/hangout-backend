@@ -11,11 +11,11 @@ async function createMessageInteractor(
   return message;
 }
 
-async function createChatRoomInteractor(
-  { createChatRoomPersistence },
+async function createChatRoomFriendsInteractor(
+  { createChatRoomFriendsPersistence },
   { id, userIds }
 ) {
-  const chatRoom = await createChatRoomPersistence({
+  const chatRoom = await createChatRoomFriendsPersistence({
     id,
     userIds,
   });
@@ -35,6 +35,6 @@ async function getMessagesFromChatRoomInteractor(
 
 export {
   createMessageInteractor,
-  createChatRoomInteractor,
+  createChatRoomFriendsInteractor,
   getMessagesFromChatRoomInteractor,
 };

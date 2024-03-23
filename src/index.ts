@@ -4,6 +4,7 @@ import "dotenv/config";
 import { userRouter } from "./routes/userRoute.js";
 import { friendRouter } from "./routes/friendRoute.js";
 import { messagesRouter } from "./routes/messagesRoute.js";
+import { chatRoomRouter } from "./routes/chatRoomRoute.js";
 import { verifyTokens, verifyTokenSocket } from "./middleware/verifyUser.js";
 
 import {
@@ -40,6 +41,7 @@ app.use(verifyTokens);
 app.use("/user", userRouter);
 app.use("/friend", friendRouter);
 app.use("/messages", messagesRouter);
+app.use("/chat-room", chatRoomRouter);
 
 const server = http.createServer(app);
 

@@ -1,7 +1,7 @@
 import { generateFriendsChatRoomId } from "../helpers/helpers.js";
 import {
   createMessage,
-  createChatRoom,
+  createChatRoomFriends,
 } from "../controllers/messagesController.js";
 import { getUserId } from "../middleware/verifyUser.js";
 
@@ -23,7 +23,7 @@ async function handleCreateFriendChat(
   const senderId = await getUserId(payload.userToken);
   const userIds = [senderId, payload.friendId];
   const chatRoomId = generateFriendsChatRoomId(senderId, payload.friendId);
-  await createChatRoom(chatRoomId, userIds);
+  await createChatRoomFriends(chatRoomId, userIds);
   socket.join(chatRoomId);
 }
 

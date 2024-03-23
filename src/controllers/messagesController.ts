@@ -1,19 +1,18 @@
 import { Request, Response } from "express";
 import { getUserId } from "../middleware/verifyUser.js";
 import { validateUserId } from "../validation/user.js";
-import { validateMessageContent } from "../validation/messages.js";
 import { generateFriendsChatRoomId } from "../helpers/helpers.js";
 
 import {
   getMessagesFromChatRoomInteractor,
   createMessageInteractor,
-  createChatRoomInteractor,
+  createChatRoomFriendsInteractor,
 } from "../interactors/messageInteractor.js";
 
 import {
   getMessagesFromChatRoomPersistence,
   createMessagePersistence,
-  createChatRoomPersistence,
+  createChatRoomFriendsPersistence,
 } from "../persistance/messagePersistence.js";
 
 async function getMessagesFromChatRoom(
@@ -81,10 +80,13 @@ async function createMessage(
   }
 }
 
-async function createChatRoom(chatRoomId: string, userIds: Array<string>) {
+async function createChatRoomFriends(
+  chatRoomId: string,
+  userIds: Array<string>
+) {
   try {
-    await createChatRoomInteractor(
-      { createChatRoomPersistence },
+    await createChatRoomFriendsInteractor(
+      { createChatRoomFriendsPersistence },
       { id: chatRoomId, userIds }
     );
   } catch (error) {
@@ -96,5 +98,5 @@ export {
   getMessagesFromChatRoom,
   getMessagesFromFriendChatRoom,
   createMessage,
-  createChatRoom,
+  createChatRoomFriends,
 };
