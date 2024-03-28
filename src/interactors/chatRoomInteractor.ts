@@ -6,4 +6,12 @@ async function createChatRoomInteractor(
   return chatRoom;
 }
 
-export { createChatRoomInteractor };
+async function getJoinedRoomsInteractor(
+  { getJoinedRoomsPersistence },
+  { userId }
+) {
+  const rooms = await getJoinedRoomsPersistence({ userId });
+  return rooms;
+}
+
+export { createChatRoomInteractor, getJoinedRoomsInteractor };

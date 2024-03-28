@@ -14,7 +14,9 @@ model User {
 
   friends Friends[]
 
-  chatRooms ChatRoom[]
+  chatRooms ChatRoom[] @relation("MembersRelation")
+
+  ownedRooms ChatRoom[] @relation("OwnerRelation")
 }
 
 model FriendRequests {
@@ -57,7 +59,9 @@ model Message {
 model ChatRoom {
   id       String   @id @default(uuid())
   name     String   @unique
-  members  User[]
+  ownerId  String? 
+  owner    User?     @relation(name: "OwnerRelation", fields: [ownerId], references: [id])
+  members  User[]   @relation(name: "MembersRelation")
 
   Messages Message[]
 }

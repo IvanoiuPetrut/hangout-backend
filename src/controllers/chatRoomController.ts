@@ -2,9 +2,15 @@ import { Request, Response } from "express";
 import { getUserId } from "../middleware/verifyUser.js";
 import { validateUserId } from "../validation/user.js";
 import { validateRoomName } from "../validation/general.js";
-import { createChatRoomInteractor } from "../interactors/chatRoomInteractor.js";
 
-import { createChatRoomPersistence } from "../persistance/chatRoomPersistence.js";
+import {
+  createChatRoomInteractor,
+  getJoinedRoomsInteractor,
+} from "../interactors/chatRoomInteractor.js";
+import {
+  createChatRoomPersistence,
+  getJoinedRoomsPersistence,
+} from "../persistance/chatRoomPersistence.js";
 
 async function createChatRoom(req: Request, res: Response): Promise<void> {
   const accessToken = req.headers["access-token"];
@@ -26,4 +32,22 @@ async function createChatRoom(req: Request, res: Response): Promise<void> {
   }
 }
 
-export { createChatRoom };
+async function getJoinedRooms(req: Request, res: Response): Promise<void> {
+  const accessToken = req.headers["access-token"];
+  const userId = await getUserId(accessToken);
+
+  try {
+    validateUserId(userId);
+
+    const rooms = await getJoinedRoomsInteractor(
+      { getJoinedRoomsPersistence },
+      { userId }
+    );
+
+    res.json(rooms);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+export { createChatRoom, getJoinedRooms };
