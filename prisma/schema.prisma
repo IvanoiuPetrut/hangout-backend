@@ -31,6 +31,18 @@ model FriendRequests {
   @@id([from, to])
 }
 
+model ChatRoomInvites {
+  id String @id @default(uuid())
+
+  chatRoomId String
+
+  toUserId String
+
+  status String @default("pending")
+
+  createdAt DateTime @default(now())
+}
+
 model Friends {
   id String @id @default(uuid())
 
