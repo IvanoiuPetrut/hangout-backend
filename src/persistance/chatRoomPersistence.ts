@@ -270,6 +270,32 @@ async function kickUserPersistence({ userId, chatRoomId, kickedUserId }) {
   });
 }
 
+async function getChatRoomDetailsPersistence({ chatRoomId, userId }) {
+  const chatRoom = await prisma.chatRoom.findFirst({
+    where: {
+      id: chatRoomId,
+      members: {
+        some: {
+          id: userId,
+        },
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      owner: true,
+      members: true,
+      messages: true,
+    },
+  });
+
+  if (!chatRoom) {
+    throw new Error("You are not a member of the chat room");
+  }
+
+  return chatRoom;
+}
+
 export {
   createChatRoomPersistence,
   getJoinedRoomsPersistence,
@@ -280,4 +306,5 @@ export {
   getUsersThatCanBeInvitedPersistence,
   kickUserPersistence,
   getRoomsWhereUserIsNotMemberPersistence,
+  getChatRoomDetailsPersistence,
 };

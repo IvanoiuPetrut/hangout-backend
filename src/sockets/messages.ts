@@ -4,6 +4,7 @@ import {
   createChatRoomFriends,
 } from "../controllers/messagesController.js";
 import { getUserId } from "../middleware/verifyUser.js";
+import { Socket, Server } from "socket.io";
 
 type createFriendChatPayload = {
   userToken: string;
@@ -13,11 +14,12 @@ type createFriendChatPayload = {
 type friendChatMessagePayload = {
   userToken: string;
   friendId: string;
+  senderPhoto: string;
   message: string;
 };
 
 async function handleCreateFriendChat(
-  socket: any,
+  socket: Socket,
   payload: createFriendChatPayload
 ) {
   const senderId = await getUserId(payload.userToken);
@@ -28,13 +30,60 @@ async function handleCreateFriendChat(
 }
 
 async function handleFriendChatMessage(
-  socket: any,
+  io: Server,
   payload: friendChatMessagePayload
 ) {
   const senderId = await getUserId(payload.userToken);
   const chatRoomId = generateFriendsChatRoomId(senderId, payload.friendId);
-  await createMessage(senderId, payload.friendId, chatRoomId, payload.message);
-  socket.to(chatRoomId).emit("friendChatMessage", payload.message);
+  const message = {
+    senderId: senderId,
+    receiverId: payload.friendId,
+    senderPhoto: payload.senderPhoto,
+    chatRoomId: chatRoomId,
+    content: payload.message,
+  };
+
+  await createMessage(
+    message.senderId,
+    message.receiverId,
+    message.senderPhoto,
+    message.chatRoomId,
+    message.content
+  );
+  io.in(chatRoomId).emit("friendChatMessage", message);
+}
+
+async function joinChatRoomSocket(socket: Socket, payload: any) {
+  console.log("joinChatRoomSocket:", socket.id, payload.chatRoomId);
+  socket.join(payload.chatRoomId);
+}
+
+async function leaveChatRoomSocket(socket: Socket, payload: any) {
+  console.log("leaveChatRoomSocket:", socket.id, payload.chatRoomId);
+  socket.leave(payload.chatRoomId);
+}
+
+async function handleChatRoomChatMessage(io: Server, payload: any) {
+  const senderId = await getUserId(payload.userToken);
+  const chatRoomId = payload.chatRoomId;
+
+  const message = {
+    senderId: senderId,
+    receiverId: "none",
+    senderPhoto: payload.senderPhoto,
+    chatRoomId: chatRoomId,
+    content: payload.message,
+  };
+
+  await createMessage(
+    message.senderId,
+    message.receiverId,
+    message.senderPhoto,
+    message.chatRoomId,
+    message.content
+  );
+
+  io.in(chatRoomId).emit("chatRoomChatMessage", message);
 }
 
 export {
@@ -42,4 +91,7 @@ export {
   handleFriendChatMessage,
   createFriendChatPayload,
   friendChatMessagePayload,
+  handleChatRoomChatMessage,
+  joinChatRoomSocket,
+  leaveChatRoomSocket,
 };

@@ -12,6 +12,7 @@ import {
   rejectInviteInteractor,
   getUsersThatCanBeInvitedInteractor,
   getRoomsWhereUserIsNotMemberInteractor,
+  getChatRoomDetailsInteractor,
   kickUserInteractor,
 } from "../interactors/chatRoomInteractor.js";
 import {
@@ -23,8 +24,27 @@ import {
   rejectInvitePersistence,
   getUsersThatCanBeInvitedPersistence,
   getRoomsWhereUserIsNotMemberPersistence,
+  getChatRoomDetailsPersistence,
   kickUserPersistence,
 } from "../persistance/chatRoomPersistence.js";
+
+async function getChatRoomDetails(req: Request, res: Response): Promise<void> {
+  const chatRoomId = req.params.chatRoomId;
+  const userId = await getUserId(req.headers["access-token"]);
+
+  try {
+    validateUserId(chatRoomId);
+
+    const chatRoom = await getChatRoomDetailsInteractor(
+      { getChatRoomDetailsPersistence },
+      { chatRoomId, userId }
+    );
+
+    res.json(chatRoom);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
 
 async function createChatRoom(req: Request, res: Response): Promise<void> {
   const accessToken = req.headers["access-token"];
@@ -208,6 +228,7 @@ async function kickUser(req: Request, res: Response): Promise<void> {
 }
 
 export {
+  getChatRoomDetails,
   createChatRoom,
   getJoinedRooms,
   sendInviteToRoom,

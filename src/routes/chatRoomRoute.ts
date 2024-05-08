@@ -2,6 +2,7 @@ import express from "express";
 const router = express.Router();
 
 import {
+  getChatRoomDetails,
   createChatRoom,
   getJoinedRooms,
   sendInviteToRoom,
@@ -13,6 +14,7 @@ import {
   kickUser,
 } from "../controllers/chatRoomController.js";
 
+router.get("/details/:chatRoomId", getChatRoomDetails);
 router.post("/create", createChatRoom);
 router.get("/joined", getJoinedRooms);
 router.post("/send-invite", sendInviteToRoom);

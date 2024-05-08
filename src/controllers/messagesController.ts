@@ -64,16 +64,19 @@ async function getMessagesFromFriendChatRoom(
 async function createMessage(
   senderId: string,
   receiverId: string,
+  senderPhoto: string,
   chatRoomId: string,
   content: string
 ) {
   try {
     validateUserId(senderId);
-    validateUserId(receiverId);
+    if (receiverId !== "none") {
+      validateUserId(receiverId);
+    }
 
     await createMessageInteractor(
       { createMessagePersistence },
-      { senderId, receiverId, chatRoomId, content }
+      { senderId, receiverId, senderPhoto, chatRoomId, content }
     );
   } catch (error) {
     console.log("error:", error);

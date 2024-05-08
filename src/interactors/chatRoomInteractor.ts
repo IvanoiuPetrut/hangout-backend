@@ -85,6 +85,14 @@ async function kickUserInteractor(
   return chatRoom;
 }
 
+async function getChatRoomDetailsInteractor(
+  { getChatRoomDetailsPersistence },
+  { chatRoomId, userId }
+) {
+  const chatRoom = await getChatRoomDetailsPersistence({ chatRoomId, userId });
+  return chatRoom;
+}
+
 export {
   createChatRoomInteractor,
   getJoinedRoomsInteractor,
@@ -95,4 +103,5 @@ export {
   getUsersThatCanBeInvitedInteractor,
   getRoomsWhereUserIsNotMemberInteractor,
   kickUserInteractor,
+  getChatRoomDetailsInteractor,
 };

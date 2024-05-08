@@ -12,6 +12,9 @@ import {
   handleFriendChatMessage,
   createFriendChatPayload,
   friendChatMessagePayload,
+  handleChatRoomChatMessage,
+  joinChatRoomSocket,
+  leaveChatRoomSocket,
 } from "./sockets/messages.js";
 
 import { Server } from "socket.io";
@@ -74,11 +77,23 @@ io.on("connection", (socket) => {
   });
 
   socket.on("friendChatMessage", async (payload: friendChatMessagePayload) => {
-    handleFriendChatMessage(socket, payload);
+    handleFriendChatMessage(io, payload);
   });
 
   socket.on("createFriendChat", async (payload: createFriendChatPayload) => {
     handleCreateFriendChat(socket, payload);
+  });
+
+  socket.on("chatRoomChatMessage", async (payload: any) => {
+    handleChatRoomChatMessage(io, payload);
+  });
+
+  socket.on("joinChatRoom", async (chatRoomId: string) => {
+    joinChatRoomSocket(socket, chatRoomId);
+  });
+
+  socket.on("leaveChatRoom", async (chatRoomId: string) => {
+    leaveChatRoomSocket(socket, chatRoomId);
   });
 
   socket.on("disconnect", () => {

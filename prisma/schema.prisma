@@ -62,6 +62,7 @@ model Message {
   senderId   String
   receiverId String?
   chatRoomId String?
+  senderPhoto String
   content    String
   createdAt  DateTime @default(now())
 
@@ -75,7 +76,7 @@ model ChatRoom {
   owner    User?     @relation(name: "OwnerRelation", fields: [ownerId], references: [id])
   members  User[]   @relation(name: "MembersRelation")
 
-  Messages Message[]
+  messages Message[]
 }
 
 datasource db {

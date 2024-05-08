@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 async function createMessagePersistence({
   senderId,
   receiverId,
+  senderPhoto,
   chatRoomId,
   content,
 }) {
@@ -13,6 +14,7 @@ async function createMessagePersistence({
     data = {
       senderId,
       receiverId,
+      senderPhoto,
       chatRoomId,
       content,
     };
@@ -20,6 +22,7 @@ async function createMessagePersistence({
     data = {
       senderId,
       receiverId,
+      senderPhoto,
       content,
     };
   }
