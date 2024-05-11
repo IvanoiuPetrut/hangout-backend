@@ -29,6 +29,12 @@ async function handleCreateFriendChat(
   socket.join(chatRoomId);
 }
 
+async function leaveFriendChat(socket: Socket, payload: any) {
+  const senderId = await getUserId(payload.userToken);
+  const chatRoomId = generateFriendsChatRoomId(senderId, payload.friendId);
+  socket.leave(chatRoomId);
+}
+
 async function handleFriendChatMessage(
   io: Server,
   payload: friendChatMessagePayload
@@ -88,6 +94,7 @@ async function handleChatRoomChatMessage(io: Server, payload: any) {
 
 export {
   handleCreateFriendChat,
+  leaveFriendChat,
   handleFriendChatMessage,
   createFriendChatPayload,
   friendChatMessagePayload,

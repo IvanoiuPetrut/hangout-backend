@@ -9,6 +9,7 @@ import { verifyTokens, verifyTokenSocket } from "./middleware/verifyUser.js";
 
 import {
   handleCreateFriendChat,
+  leaveFriendChat,
   handleFriendChatMessage,
   createFriendChatPayload,
   friendChatMessagePayload,
@@ -82,6 +83,10 @@ io.on("connection", (socket) => {
 
   socket.on("createFriendChat", async (payload: createFriendChatPayload) => {
     handleCreateFriendChat(socket, payload);
+  });
+
+  socket.on("leaveFriendChat", async (payload: any) => {
+    leaveFriendChat(socket, payload);
   });
 
   socket.on("chatRoomChatMessage", async (payload: any) => {
