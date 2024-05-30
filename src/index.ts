@@ -5,7 +5,11 @@ import { userRouter } from "./routes/userRoute.js";
 import { friendRouter } from "./routes/friendRoute.js";
 import { messagesRouter } from "./routes/messagesRoute.js";
 import { chatRoomRouter } from "./routes/chatRoomRoute.js";
-import { verifyTokens, verifyTokenSocket } from "./middleware/verifyUser.js";
+import {
+  getUserId,
+  verifyTokens,
+  verifyTokenSocket,
+} from "./middleware/verifyUser.js";
 
 import {
   handleCreateFriendChat,
@@ -20,6 +24,8 @@ import {
 
 import { Server } from "socket.io";
 import http from "http";
+import https from "https";
+import fs from "fs";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -38,6 +44,10 @@ const port = process.env.PORT || 3000;
 
 // app.use(cors(corsOptions));
 
+//console log COGNITO_CLIENT_ID,COGNITO_USER_POOL_ID from env
+console.log("client id: ", process.env.COGNITO_CLIENT_ID);
+console.log("user pool id: ", process.env.COGNITO_USER_POOL_ID);
+
 app.use(cors());
 
 app.use(express.json());
@@ -47,6 +57,7 @@ app.use("/friend", friendRouter);
 app.use("/messages", messagesRouter);
 app.use("/chat-room", chatRoomRouter);
 
+// const server = http.createServer(app);
 const server = http.createServer(app);
 
 app.get("/", (req, res) => {
@@ -54,7 +65,7 @@ app.get("/", (req, res) => {
 });
 
 server.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
+  console.log(`Server listening at http://localhost:${port} :)`);
 });
 
 const io = new Server(server, {
@@ -71,6 +82,20 @@ io.use(async (socket, next) => {
   }
   return next(new Error("Authentication error"));
 });
+
+type chatRoomUsers = {
+  id: string;
+  socketId: string;
+  name: string;
+  photo: string;
+};
+
+type chatRooms = {
+  chatRoomId: string;
+  users: chatRoomUsers[];
+};
+
+const chatRooms: chatRooms[] = [];
 
 io.on("connection", (socket) => {
   socket.on("connect", () => {
@@ -101,7 +126,86 @@ io.on("connection", (socket) => {
     leaveChatRoomSocket(socket, chatRoomId);
   });
 
+  socket.on(
+    "joinVoiceRoom",
+    async (payload: {
+      chatRoomId: string;
+      userName: string;
+      userPhoto: string;
+    }) => {
+      const userToken = socket.handshake.auth.token;
+      const userId = await getUserId(userToken);
+      socket.join(payload.chatRoomId + "-voice");
+      console.log(
+        "joinVoiceRoom",
+        payload.chatRoomId,
+        userId,
+        payload.userName
+      );
+      const chatRoom = chatRooms.find(
+        (chatRoom) => chatRoom.chatRoomId === payload.chatRoomId
+      );
+      if (chatRoom) {
+        chatRoom.users.push({
+          id: userId,
+          socketId: socket.id,
+          name: payload.userName,
+          photo: payload.userPhoto,
+        });
+      } else {
+        chatRooms.push({
+          chatRoomId: payload.chatRoomId,
+          users: [
+            {
+              id: userId,
+              socketId: socket.id,
+              name: payload.userName,
+              photo: payload.userPhoto,
+            },
+          ],
+        });
+      }
+      const newChatRoom = chatRooms.find(
+        (chatRoom) => chatRoom.chatRoomId === payload.chatRoomId
+      );
+      io.in(payload.chatRoomId + "-voice").emit(
+        "userJoinedVoiceRoom",
+        newChatRoom.users
+      );
+    }
+  );
+
+  socket.on("leaveVoiceRoom", async (payload: { chatRoomId: string }) => {
+    const userToken = socket.handshake.auth.token;
+    const userId = await getUserId(userToken);
+    const chatRoom = chatRooms.find(
+      (chatRoom) => chatRoom.chatRoomId === payload.chatRoomId
+    );
+    if (chatRoom) {
+      const userIndex = chatRoom.users.findIndex((user) => user.id === userId);
+      if (userIndex > -1) {
+        chatRoom.users.splice(userIndex, 1);
+      }
+      socket
+        .to(payload.chatRoomId + "-voice")
+        .emit("userLeftVoiceRoom", chatRoom.users);
+    }
+  });
+
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id);
+    chatRooms.forEach((chatRoom) => {
+      const userIndex = chatRoom.users.findIndex(
+        (user) => user.socketId === socket.id
+      );
+      if (userIndex > -1) {
+        chatRoom.users.splice(userIndex, 1);
+        io.in(chatRoom.chatRoomId + "-voice").emit(
+          "userLeftVoiceRoom",
+          chatRoom.users
+        );
+      }
+    });
+    console.log("chatRooms", chatRooms);
   });
 });

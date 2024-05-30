@@ -1,0 +1,24 @@
+version: "3"
+services:
+  express-app:
+    image: petrut27/hangout-app:latest
+    container_name: express-app
+    restart: always
+    volumes:
+      - sqlite-db:/app/prisma
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - express-app
+
+volumes:
+  sqlite-db:
+    driver: local
