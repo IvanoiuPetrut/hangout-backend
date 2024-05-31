@@ -192,6 +192,70 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on(
+    "sendIceCandidate",
+    async (payload: {
+      iceCandidate: any;
+      chatRoomId: string;
+      forUserId: string;
+    }) => {
+      console.log("sendIceCandidate");
+      const userId = await getUserId(socket.handshake.auth.token);
+      const socketId = chatRooms
+        .find((chatRoom) => chatRoom.chatRoomId === payload.chatRoomId)
+        ?.users.find((user) => user.id === payload.forUserId)?.socketId;
+      socket.to(socketId).emit("receiveIceCandidate", {
+        iceCandidate: payload.iceCandidate,
+        userId: userId,
+      });
+    }
+  );
+
+  socket.on(
+    "sendIceCandidateToTheOferrer",
+    async (payload: {
+      iceCandidate: any;
+      chatRoomId: string;
+      toSocketId: string;
+    }) => {
+      console.log("sendIceCandidateToTheOferrer");
+      const userId = await getUserId(socket.handshake.auth.token);
+      socket.to(payload.toSocketId).emit("receiveIceCandidate", {
+        iceCandidate: payload.iceCandidate,
+        userId: userId,
+      });
+    }
+  );
+
+  socket.on(
+    "sendOffer",
+    async (payload: { offer: any; chatRoomId: string; forUserId: string }) => {
+      console.log("sendOffer");
+      const userId = await getUserId(socket.handshake.auth.token);
+      const socketId = chatRooms
+        .find((chatRoom) => chatRoom.chatRoomId === payload.chatRoomId)
+        ?.users.find((user) => user.id === payload.forUserId)?.socketId;
+      socket.to(socketId).emit("receiveOffer", {
+        offer: payload.offer,
+        socketId: socket.id,
+        userId: userId,
+      });
+    }
+  );
+
+  socket.on(
+    "sendAnswer",
+    async (payload: { answer: any; toSocketId: string }) => {
+      console.log("sendAnswer");
+      const userId = await getUserId(socket.handshake.auth.token);
+      socket.to(payload.toSocketId).emit("receiveAnswer", {
+        answer: payload.answer,
+        socketId: socket.id,
+        userId: userId,
+      });
+    }
+  );
+
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id);
     chatRooms.forEach((chatRoom) => {
