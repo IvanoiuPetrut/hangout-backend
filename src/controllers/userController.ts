@@ -12,6 +12,7 @@ import {
   getUserDetailsInteractor,
   updateUserDetailsInteractor,
   getUsersInteractor,
+  updateUserProfilePictureInteractor,
 } from "../interactors/userInteractor.js";
 
 import {
@@ -21,6 +22,7 @@ import {
   getUserDetailsPersistence,
   updateUserDetailsPersistence,
   getUsersPersistence,
+  updateUserProfilePicturePersistence,
 } from "../persistance/userPersistence.js";
 
 import { getUserId } from "../middleware/verifyUser.js";
@@ -114,4 +116,33 @@ async function getUsers(req: Request, res: Response): Promise<void> {
   }
 }
 
-export { createUser, getUserById, getUserDetails, updateUserDetails, getUsers };
+async function createProfilePicture(req: Request, res: Response): Promise<any> {
+  const accessToken = req.headers["access-token"];
+  const userId = await getUserId(accessToken);
+  console.log("profile pic", userId);
+
+  if (!req.file) {
+    return res.status(400).send("No files were uploaded.");
+  }
+
+  const file = req.file;
+
+  try {
+    const user = await updateUserProfilePictureInteractor(
+      { updateUserProfilePicturePersistence },
+      { userId, file }
+    );
+    res.json(user);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+export {
+  createUser,
+  getUserById,
+  getUserDetails,
+  updateUserDetails,
+  getUsers,
+  createProfilePicture,
+};

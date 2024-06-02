@@ -45,10 +45,22 @@ async function getUsersInteractor(
   return users;
 }
 
+async function updateUserProfilePictureInteractor(
+  { updateUserProfilePicturePersistence },
+  { userId, file }
+): Promise<UserDto> {
+  const userDto: UserDto = await updateUserProfilePicturePersistence({
+    userId,
+    file,
+  });
+  return userDto;
+}
+
 export {
   createUserInteractor,
   getUserByIdInteractor,
   getUserDetailsInteractor,
   updateUserDetailsInteractor,
   getUsersInteractor,
+  updateUserProfilePictureInteractor,
 };

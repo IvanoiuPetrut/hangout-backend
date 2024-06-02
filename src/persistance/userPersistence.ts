@@ -1,4 +1,13 @@
 import { PrismaClient } from "@prisma/client";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+
+const s3Client = new S3Client({
+  region: "eu-central-1",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 const prisma = new PrismaClient();
 
@@ -84,10 +93,42 @@ async function getUsersPersistence({ name, id }) {
   return users;
 }
 
+async function updateUserProfilePicturePersistence({ userId, file }) {
+  console.log(file.buffer);
+  const command = new PutObjectCommand({
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: userId + "." + file.mimetype.split("/")[1],
+    Body: file.buffer,
+    ContentType: file.mimetype,
+  });
+
+  try {
+    await s3Client.send(command);
+  } catch (error) {
+    console.log(error);
+  }
+
+  const fileName = `https://${
+    process.env.AWS_BUCKET_NAME
+  }.s3.amazonaws.com/${userId}.${file.mimetype.split("/")[1]}`;
+
+  const user = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      photo: fileName,
+    },
+  });
+
+  return user;
+}
+
 export {
   createUserPersistence,
   getUserByIdPersistence,
   getUserDetailsPersistence,
   updateUserDetailsPersistence,
   getUsersPersistence,
+  updateUserProfilePicturePersistence,
 };

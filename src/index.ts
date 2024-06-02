@@ -49,7 +49,6 @@ console.log("client id: ", process.env.COGNITO_CLIENT_ID);
 console.log("user pool id: ", process.env.COGNITO_USER_POOL_ID);
 
 app.use(cors());
-
 app.use(express.json());
 app.use(verifyTokens);
 app.use("/user", userRouter);
