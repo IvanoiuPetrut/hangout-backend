@@ -31,10 +31,6 @@ async function getJoinedRoomsPersistence({ userId }) {
   return roomsThatAreNotFriendChats;
 }
 
-//   rejectInvitePersistence,
-//   getUsersThatCanBeInvitedPersistence,
-//   kickUserPersistence,
-
 async function sendInviteToRoomPersistence({
   userId,
   chatRoomId,

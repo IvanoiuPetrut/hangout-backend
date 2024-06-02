@@ -10,8 +10,18 @@ async function createMessagePersistence({
   content,
 }) {
   let data;
+  const user = await prisma.user.findUnique({
+    where: {
+      id: senderId,
+    },
+    select: {
+      username: true,
+    },
+  });
+
   if (chatRoomId) {
     data = {
+      senderName: user.username,
       senderId,
       receiverId,
       senderPhoto,
@@ -20,6 +30,7 @@ async function createMessagePersistence({
     };
   } else {
     data = {
+      senderName: user.username,
       senderId,
       receiverId,
       senderPhoto,
@@ -27,7 +38,6 @@ async function createMessagePersistence({
     };
   }
 
-  console.log("data:", data);
   const message = await prisma.message.create({
     data,
   });

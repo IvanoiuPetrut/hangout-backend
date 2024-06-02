@@ -59,6 +59,7 @@ model Friends {
 
 model Message {
   id         String   @id @default(uuid())
+  senderName String   @default("Anonymous")
   senderId   String
   receiverId String?
   chatRoomId String?

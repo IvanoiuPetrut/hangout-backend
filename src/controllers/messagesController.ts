@@ -74,10 +74,11 @@ async function createMessage(
       validateUserId(receiverId);
     }
 
-    await createMessageInteractor(
+    const message = await createMessageInteractor(
       { createMessagePersistence },
       { senderId, receiverId, senderPhoto, chatRoomId, content }
     );
+    return message;
   } catch (error) {
     console.log("error:", error);
   }

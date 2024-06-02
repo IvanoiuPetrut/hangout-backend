@@ -49,14 +49,14 @@ async function handleFriendChatMessage(
     content: payload.message,
   };
 
-  await createMessage(
+  const messagePersistance = await createMessage(
     message.senderId,
     message.receiverId,
     message.senderPhoto,
     message.chatRoomId,
     message.content
   );
-  io.in(chatRoomId).emit("friendChatMessage", message);
+  io.in(chatRoomId).emit("friendChatMessage", messagePersistance);
 }
 
 async function joinChatRoomSocket(socket: Socket, payload: any) {
@@ -81,7 +81,7 @@ async function handleChatRoomChatMessage(io: Server, payload: any) {
     content: payload.message,
   };
 
-  await createMessage(
+  const messagePersistance = await createMessage(
     message.senderId,
     message.receiverId,
     message.senderPhoto,
@@ -89,7 +89,7 @@ async function handleChatRoomChatMessage(io: Server, payload: any) {
     message.content
   );
 
-  io.in(chatRoomId).emit("chatRoomChatMessage", message);
+  io.in(chatRoomId).emit("chatRoomChatMessage", messagePersistance);
 }
 
 export {
