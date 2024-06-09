@@ -34,8 +34,14 @@ async function getMessagesFromChatRoomInteractor(
   return messages;
 }
 
+async function uploadFileInteractor({ uploadFilePersistence }, { file }) {
+  const fileUrl = await uploadFilePersistence({ file });
+  return fileUrl;
+}
+
 export {
   createMessageInteractor,
   createChatRoomFriendsInteractor,
   getMessagesFromChatRoomInteractor,
+  uploadFileInteractor,
 };

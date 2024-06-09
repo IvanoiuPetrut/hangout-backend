@@ -94,7 +94,6 @@ async function getUsersPersistence({ name, id }) {
 }
 
 async function updateUserProfilePicturePersistence({ userId, file }) {
-  console.log(file.buffer);
   const command = new PutObjectCommand({
     Bucket: process.env.AWS_BUCKET_NAME,
     Key: userId + "." + file.mimetype.split("/")[1],

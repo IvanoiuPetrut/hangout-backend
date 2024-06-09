@@ -1,0 +1,75 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id String [pk]
+  username String [unique, not null]
+  photo String [default: 'https://www.gravatar.com/avatar/3b3be63a4c2asdas01asdasda02?d=identicon']
+  friends Friends [not null]
+  chatRooms ChatRoom [not null]
+  ownedRooms ChatRoom [not null]
+}
+
+Table FriendRequests {
+  from String [not null]
+  to String [not null]
+  status String [not null, default: 'pending']
+  createdAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (from, to) [pk]
+  }
+}
+
+Table ChatRoomInvites {
+  id String [pk]
+  chatRoomId String [not null]
+  toUserId String [not null]
+  status String [not null, default: 'pending']
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table Friends {
+  id String [pk]
+  friendId String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  User User
+  userId String
+
+  indexes {
+    (userId, friendId) [unique]
+  }
+}
+
+Table Message {
+  id String [pk]
+  senderName String [not null, default: 'Anonymous']
+  senderId String [not null]
+  receiverId String
+  chatRoomId String
+  senderPhoto String [not null]
+  content String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  ChatRoom ChatRoom
+}
+
+Table ChatRoom {
+  id String [pk]
+  name String [unique, not null]
+  ownerId String
+  owner User
+  members User [not null]
+  messages Message [not null]
+}
+
+Table MembersRelation {
+  chatroomsId String [ref: > ChatRoom.id]
+  membersId String [ref: > User.id]
+}
+
+Ref: Friends.userId > User.id
+
+Ref: Message.chatRoomId > ChatRoom.id
+
+Ref: ChatRoom.ownerId > User.id

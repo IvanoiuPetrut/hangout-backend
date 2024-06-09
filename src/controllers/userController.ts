@@ -122,7 +122,7 @@ async function createProfilePicture(req: Request, res: Response): Promise<any> {
   console.log("profile pic", userId);
 
   if (!req.file) {
-    return res.status(400).send("No files were uploaded.");
+    return res.status(400).send("No file uploaded.");
   }
 
   const file = req.file;

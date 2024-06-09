@@ -7,12 +7,14 @@ import {
   getMessagesFromChatRoomInteractor,
   createMessageInteractor,
   createChatRoomFriendsInteractor,
+  uploadFileInteractor,
 } from "../interactors/messageInteractor.js";
 
 import {
   getMessagesFromChatRoomPersistence,
   createMessagePersistence,
   createChatRoomFriendsPersistence,
+  uploadFilePersistence,
 } from "../persistance/messagePersistence.js";
 
 async function getMessagesFromChatRoom(
@@ -98,9 +100,28 @@ async function createChatRoomFriends(
   }
 }
 
+async function uploadFile(req: Request, res: Response) {
+  try {
+    const file = req.file;
+    if (!file) {
+      res.status(400).json({ error: "No file uploaded" });
+      return;
+    }
+
+    const fileUrl = await uploadFileInteractor(
+      { uploadFilePersistence },
+      { file }
+    );
+    res.json({ fileUrl: fileUrl });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
 export {
   getMessagesFromChatRoom,
   getMessagesFromFriendChatRoom,
   createMessage,
   createChatRoomFriends,
+  uploadFile,
 };
