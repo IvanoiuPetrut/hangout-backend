@@ -8,10 +8,12 @@ import {
   getMessagesFromChatRoom,
   getMessagesFromFriendChatRoom,
   uploadFile,
+  summarizeMessages,
 } from "../controllers/messagesController.js";
 
 router.get("/:chatRoomId", getMessagesFromChatRoom);
 router.get("/friend/:friendId", getMessagesFromFriendChatRoom);
 router.post("/upload-file", upload.single("file"), uploadFile);
+router.post("/summarize", summarizeMessages);
 
 export { router as messagesRouter };

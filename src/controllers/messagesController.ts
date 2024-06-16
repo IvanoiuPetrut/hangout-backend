@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { getUserId } from "../middleware/verifyUser.js";
 import { validateUserId } from "../validation/user.js";
 import { generateFriendsChatRoomId } from "../helpers/helpers.js";
+import OpenAI from "openai";
 
 import {
   getMessagesFromChatRoomInteractor,
@@ -16,6 +17,10 @@ import {
   createChatRoomFriendsPersistence,
   uploadFilePersistence,
 } from "../persistance/messagePersistence.js";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 async function getMessagesFromChatRoom(
   req: Request,
@@ -118,10 +123,43 @@ async function uploadFile(req: Request, res: Response) {
   }
 }
 
+async function summarizeMessages(req: Request, res: Response) {
+  const messages = req.body.messages;
+  if (!messages || !Array.isArray(messages)) {
+    return res.status(400).send({ error: "Invalid messages format" });
+  }
+  try {
+    const messagesText = messages
+      .map((msg) => `Sender name: ${msg.name} and content: ${msg.content}`)
+      .join("\n");
+    messages.reverse();
+
+    const response = await openai.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "Summarize the following messages in one sentence:",
+        },
+        { role: "user", content: messagesText },
+      ],
+      model: "gpt-3.5-turbo",
+      max_tokens: 100,
+      n: 1,
+    });
+
+    const summary = response.choices[0].message.content;
+    res.send({ summary });
+  } catch (error) {
+    console.error("Error communicating with OpenAI:", error);
+    res.status(500).send({ error: "Error summarizing messages" });
+  }
+}
+
 export {
   getMessagesFromChatRoom,
   getMessagesFromFriendChatRoom,
   createMessage,
   createChatRoomFriends,
   uploadFile,
+  summarizeMessages,
 };
