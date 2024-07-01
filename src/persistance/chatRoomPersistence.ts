@@ -233,6 +233,8 @@ async function kickUserPersistence({ userId, chatRoomId, kickedUserId }) {
     },
   });
 
+  console.log("kickUser pers", userId, chatRoomId, kickedUserId);
+
   if (!chatRoom) {
     throw new Error("You are not the owner of the chat room");
   }

@@ -271,4 +271,11 @@ io.on("connection", (socket) => {
     });
     console.log("chatRooms", chatRooms);
   });
+
+  socket.on(
+    "kickUser",
+    async (payload: { chatRoomId: string; userId: string }) => {
+      io.in(payload.chatRoomId).emit("userKicked", { userId: payload.userId });
+    }
+  );
 });

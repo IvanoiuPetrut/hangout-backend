@@ -77,10 +77,11 @@ async function kickUserInteractor(
   { kickUserPersistence },
   { userId, chatRoomId, userToKickId }
 ) {
+  console.log("kickUser int", userId, chatRoomId, userToKickId);
   const chatRoom = await kickUserPersistence({
     userId,
     chatRoomId,
-    userToKickId,
+    kickedUserId: userToKickId,
   });
   return chatRoom;
 }

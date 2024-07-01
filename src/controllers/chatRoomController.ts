@@ -210,6 +210,7 @@ async function kickUser(req: Request, res: Response): Promise<void> {
   const accessToken = req.headers["access-token"];
   const userId = await getUserId(accessToken);
   const { chatRoomId, userToKickId } = req.body;
+  console.log("kickUser", userId, chatRoomId, userToKickId);
 
   try {
     validateUserId(userId);
