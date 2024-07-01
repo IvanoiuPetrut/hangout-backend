@@ -120,6 +120,15 @@ async function updateUserProfilePicturePersistence({ userId, file }) {
     },
   });
 
+  await prisma.message.updateMany({
+    where: {
+      senderId: userId,
+    },
+    data: {
+      senderPhoto: fileName,
+    },
+  });
+
   return user;
 }
 
