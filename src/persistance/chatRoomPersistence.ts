@@ -281,6 +281,7 @@ async function getChatRoomDetailsPersistence({ chatRoomId, userId }) {
     select: {
       id: true,
       name: true,
+      description: true,
       owner: true,
       members: true,
       messages: true,
@@ -294,6 +295,58 @@ async function getChatRoomDetailsPersistence({ chatRoomId, userId }) {
   return chatRoom;
 }
 
+async function editChatRoomNamePersistence({ userId, chatRoomId, name }) {
+  const chatRoom = await prisma.chatRoom.findFirst({
+    where: {
+      id: chatRoomId,
+      ownerId: userId,
+    },
+  });
+
+  if (!chatRoom) {
+    throw new Error("You are not the owner of the chat room");
+  }
+
+  const updatedChatRoom = await prisma.chatRoom.update({
+    where: {
+      id: chatRoomId,
+    },
+    data: {
+      name,
+    },
+  });
+
+  return updatedChatRoom;
+}
+
+async function editChatRoomDescriptionPersistence({
+  userId,
+  chatRoomId,
+  description,
+}) {
+  const chatRoom = await prisma.chatRoom.findFirst({
+    where: {
+      id: chatRoomId,
+      ownerId: userId,
+    },
+  });
+
+  if (!chatRoom) {
+    throw new Error("You are not the owner of the chat room");
+  }
+
+  const updatedChatRoom = await prisma.chatRoom.update({
+    where: {
+      id: chatRoomId,
+    },
+    data: {
+      description,
+    },
+  });
+
+  return updatedChatRoom;
+}
+
 export {
   createChatRoomPersistence,
   getJoinedRoomsPersistence,
@@ -305,4 +358,6 @@ export {
   kickUserPersistence,
   getRoomsWhereUserIsNotMemberPersistence,
   getChatRoomDetailsPersistence,
+  editChatRoomNamePersistence,
+  editChatRoomDescriptionPersistence,
 };

@@ -73,6 +73,7 @@ model Message {
 model ChatRoom {
   id       String   @id @default(uuid())
   name     String   @unique
+  description String @default("No description")
   ownerId  String? 
   owner    User?     @relation(name: "OwnerRelation", fields: [ownerId], references: [id])
   members  User[]   @relation(name: "MembersRelation")

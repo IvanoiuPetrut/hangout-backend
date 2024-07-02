@@ -57,6 +57,7 @@ Table Message {
 Table ChatRoom {
   id String [pk]
   name String [unique, not null]
+  description String [not null, default: 'No description']
   ownerId String
   owner User
   members User [not null]

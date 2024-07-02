@@ -26,6 +26,8 @@ import {
   getRoomsWhereUserIsNotMemberPersistence,
   getChatRoomDetailsPersistence,
   kickUserPersistence,
+  editChatRoomDescriptionPersistence,
+  editChatRoomNamePersistence,
 } from "../persistance/chatRoomPersistence.js";
 
 async function getChatRoomDetails(req: Request, res: Response): Promise<void> {
@@ -228,6 +230,54 @@ async function kickUser(req: Request, res: Response): Promise<void> {
   }
 }
 
+async function editChatRoomName(req: Request, res: Response): Promise<void> {
+  const accessToken = req.headers["access-token"];
+  const userId = await getUserId(accessToken);
+  const { chatRoomId, name } = req.body;
+
+  try {
+    validateUserId(userId);
+    validateUserId(chatRoomId);
+    validateRoomName(name);
+
+    const chatRoom = await editChatRoomNamePersistence({
+      userId,
+      chatRoomId,
+      name,
+    });
+
+    res.status(200).json({ message: "Room name updated" });
+  } catch (error) {
+    console.log("SUNTEM AICI");
+    console.log(error.message);
+    res.status(400).json({ message: error.message });
+  }
+}
+
+async function editChatRoomDescription(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const accessToken = req.headers["access-token"];
+  const userId = await getUserId(accessToken);
+  const { chatRoomId, description } = req.body;
+
+  try {
+    validateUserId(userId);
+    validateUserId(chatRoomId);
+
+    const chatRoom = await editChatRoomDescriptionPersistence({
+      userId,
+      chatRoomId,
+      description,
+    });
+
+    res.status(200).json({ message: "Room description updated" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+
 export {
   getChatRoomDetails,
   createChatRoom,
@@ -239,4 +289,6 @@ export {
   getUsersThatCanBeInvited,
   getRoomsWhereUserIsNotMember,
   kickUser,
+  editChatRoomName,
+  editChatRoomDescription,
 };

@@ -12,10 +12,14 @@ import {
   getUsersThatCanBeInvited,
   getRoomsWhereUserIsNotMember,
   kickUser,
+  editChatRoomName,
+  editChatRoomDescription,
 } from "../controllers/chatRoomController.js";
 
 router.get("/details/:chatRoomId", getChatRoomDetails);
 router.post("/create", createChatRoom);
+router.post("/edit-name", editChatRoomName);
+router.post("/edit-description", editChatRoomDescription);
 router.get("/joined", getJoinedRooms);
 router.post("/send-invite", sendInviteToRoom);
 router.get("/invites", getInvites);
