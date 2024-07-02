@@ -14,6 +14,8 @@ import {
   kickUser,
   editChatRoomName,
   editChatRoomDescription,
+  deleteChatRoom,
+  leaveChatRoom,
 } from "../controllers/chatRoomController.js";
 
 router.get("/details/:chatRoomId", getChatRoomDetails);
@@ -35,5 +37,7 @@ router.get("/test/:userId", (req, res) => {
   res.json({ message: "Hello from chat room route", userId });
 });
 router.post("/kick-user", kickUser);
+router.post("/delete/:chatRoomId", deleteChatRoom);
+router.post("/leave/:chatRoomId", leaveChatRoom);
 
 export { router as chatRoomRouter };

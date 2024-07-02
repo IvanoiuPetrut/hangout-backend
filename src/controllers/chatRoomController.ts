@@ -28,6 +28,8 @@ import {
   kickUserPersistence,
   editChatRoomDescriptionPersistence,
   editChatRoomNamePersistence,
+  leaveChatRoomPersistence,
+  deleteChatRoomPersistence,
 } from "../persistance/chatRoomPersistence.js";
 
 async function getChatRoomDetails(req: Request, res: Response): Promise<void> {
@@ -278,6 +280,41 @@ async function editChatRoomDescription(
   }
 }
 
+async function deleteChatRoom(req: Request, res: Response): Promise<void> {
+  const accessToken = req.headers["access-token"];
+  const userId = await getUserId(accessToken);
+  const chatRoomId = req.params.chatRoomId;
+
+  try {
+    validateUserId(userId);
+    validateUserId(chatRoomId);
+
+    await deleteChatRoomPersistence({ userId, chatRoomId });
+
+    res.status(200).json({ message: "Room deleted" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+
+async function leaveChatRoom(req: Request, res: Response): Promise<void> {
+  const accessToken = req.headers["access-token"];
+  const userId = await getUserId(accessToken);
+  const chatRoomId = req.params.chatRoomId;
+
+  try {
+    validateUserId(userId);
+    validateUserId(chatRoomId);
+
+    console.log("leaveChatRoom", userId, chatRoomId);
+    await leaveChatRoomPersistence({ userId, chatRoomId });
+
+    res.status(200).json({ message: "Room left" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+
 export {
   getChatRoomDetails,
   createChatRoom,
@@ -291,4 +328,6 @@ export {
   kickUser,
   editChatRoomName,
   editChatRoomDescription,
+  deleteChatRoom,
+  leaveChatRoom,
 };
