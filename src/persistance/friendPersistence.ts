@@ -98,6 +98,35 @@ async function getFriendsPersistence({ userId }) {
   return friends;
 }
 
+async function deleteFriendPersistence(userId, friendId) {
+  await prisma.friends.deleteMany({
+    where: {
+      userId,
+      friendId,
+    },
+  });
+  await prisma.friends.deleteMany({
+    where: {
+      userId: friendId,
+      friendId: userId,
+    },
+  });
+
+  await prisma.friendRequests.deleteMany({
+    where: {
+      from: userId,
+      to: friendId,
+    },
+  });
+
+  await prisma.friendRequests.deleteMany({
+    where: {
+      from: friendId,
+      to: userId,
+    },
+  });
+}
+
 export {
   createFriendRequestPersistence,
   getFriendRequestPersistence,
@@ -105,4 +134,5 @@ export {
   acceptFriendRequestPersistence,
   declineFriendRequestPersistence,
   getFriendsPersistence,
+  deleteFriendPersistence,
 };

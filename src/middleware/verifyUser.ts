@@ -14,9 +14,10 @@ async function verifyTokens(req, res, next) {
   }
 
   try {
-    await verifier.verify(accessToken);
+    const payload = await verifier.verify(accessToken);
     next();
   } catch (err) {
+    console.log(err);
     return res.status(401).json({ message: "Invalid tokens" });
   }
 }

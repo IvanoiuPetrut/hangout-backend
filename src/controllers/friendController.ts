@@ -19,6 +19,7 @@ import {
   acceptFriendRequestPersistence,
   declineFriendRequestPersistence,
   getFriendsPersistence,
+  deleteFriendPersistence,
 } from "../persistance/friendPersistence.js";
 
 async function createFriendRequest(req: Request, res: Response): Promise<void> {
@@ -141,6 +142,19 @@ async function getFriends(req: Request, res: Response): Promise<void> {
   }
 }
 
+async function deleteFriend(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const userId = await getUserId(req.headers["access-token"]);
+
+  try {
+    const friendRequest = deleteFriendPersistence(userId, id);
+
+    res.json(friendRequest);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
 export {
   createFriendRequest,
   getFriendRequest,
@@ -148,4 +162,5 @@ export {
   acceptFriendRequest,
   declineFriendRequest,
   getFriends,
+  deleteFriend,
 };
