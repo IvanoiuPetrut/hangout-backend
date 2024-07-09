@@ -68,6 +68,8 @@ async function getUserDetailsPersistence({ id }) {
 }
 
 async function updateUserDetailsPersistence({ id, username }) {
+  console.log(id);
+  console.log(username);
   prisma.message.updateMany({
     where: {
       senderId: id,
@@ -76,6 +78,15 @@ async function updateUserDetailsPersistence({ id, username }) {
       senderName: username,
     },
   });
+
+  // await prisma.message.updateMany({
+  //   where: {
+  //     senderId: userId,
+  //   },
+  //   data: {
+  //     senderPhoto: fileName,
+  //   },
+  // });
 
   const user = await prisma.user.update({
     where: {
