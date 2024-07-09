@@ -68,6 +68,15 @@ async function getUserDetailsPersistence({ id }) {
 }
 
 async function updateUserDetailsPersistence({ id, username }) {
+  prisma.message.updateMany({
+    where: {
+      senderId: id,
+    },
+    data: {
+      senderName: username,
+    },
+  });
+
   const user = await prisma.user.update({
     where: {
       id,
@@ -76,6 +85,7 @@ async function updateUserDetailsPersistence({ id, username }) {
       username,
     },
   });
+
   return user;
 }
 
