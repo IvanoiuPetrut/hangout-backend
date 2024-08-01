@@ -1,5 +1,5 @@
 <a href="#">
-    <img src="https://i.postimg.cc/zXWvtRHy/pngwing-com.png" alt="Weather app logo" align="right" height="60" />
+    <img src="https://i.postimg.cc/Bv6Cnp9z/group.png" alt="Weather app logo" align="right" height="60" />
 </a>
 
 # Hangout
@@ -9,7 +9,8 @@ Hangout is web app that allows you to communicate with other persons, either tho
 <a href="https://www.youtube.com/watch?v=HNb0TTiL960">Hangout Demo</a>
 
 <p align="center">
-  <img src="https://repository-images.githubusercontent.com/507885601/db5f7caa-3f2e-471d-8c3e-b569f95cd2dd" alt="Photo of the presentation of the project"/>
+  <img src="https://i.postimg.cc/Y0rTqW3C/image-mare.png" alt="Photo of the presentation of the project"/>
+  <img src="https://i.postimg.cc/xTFBnqb9/imageaudiovideo.png" alt="Photo of the presentation of the project"/>
 </p>
 
 ## Features
@@ -28,16 +29,17 @@ Hangout is web app that allows you to communicate with other persons, either tho
 
 ## Technologies
 
-- Vue 3 - Composition API
+- Express
+- Web Sockets
+- WebRTC
 - TypeScript
-- Pinia
-- Vue Router
-- Tailwind + DaisyUI
-- AWS Services: Cognito, S3, Amplify
+- Prisma
+- AWS SDKs: Cognito, S3
+- Molter
 
 ## Build process
 
 - `npm install` (to install dependencies)
 - `npm run dev` (to run the app)
-- `npm build` (for production)
-- `npm run buildw` (build TypeScript to JavaScript as code changes)
+- `npm run build` (for production)
+- `npm run buildw` (build code to JavaScript from TypeScript on code change)
